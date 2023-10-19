@@ -22,7 +22,6 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
   List<int> maDayList;
   final ChartStyle chartStyle;
   final ChartColors chartColors;
-  final double mLineStrokeWidth = 1.0;
   double scaleX;
   late Paint mLinePaint;
   final VerticalTextAlignment verticalTextAlignment;
@@ -52,7 +51,7 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
     mLinePaint = Paint()
       ..isAntiAlias = true
       ..style = PaintingStyle.stroke
-      ..strokeWidth = mLineStrokeWidth
+      ..strokeWidth = this.chartStyle.mLineStrokeWidth
       ..color = this.chartColors.kLineColor;
     _contentRect = Rect.fromLTRB(
         chartRect.left,
@@ -172,8 +171,12 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
     canvas.drawPath(mLineFillPath!, mLineFillPaint);
     mLineFillPath!.reset();
 
-    canvas.drawPath(mLinePath!,
-        mLinePaint..strokeWidth = (mLineStrokeWidth / scaleX).clamp(0.1, 1.0));
+    canvas.drawPath(
+        mLinePath!,
+        mLinePaint
+          ..strokeWidth = (this.chartStyle.mLineStrokeWidth / scaleX).clamp(
+              this.chartStyle.mLineMinStrokeWidth,
+              this.chartStyle.mLineMaxStrokeWidth));
     mLinePath!.reset();
   }
 

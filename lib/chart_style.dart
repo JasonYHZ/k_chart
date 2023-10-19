@@ -103,6 +103,12 @@ class ChartStyle {
   //现在价格的线条粗细
   double nowPriceLineWidth = 1;
 
+  // Line线基准宽度
+  double mLineStrokeWidth = 1;
+  double mLineMinStrokeWidth = 0.1;
+  double mLineMaxStrokeWidth = 1;
+
+
   int gridRows = 4;
 
   int gridColumns = 4;
