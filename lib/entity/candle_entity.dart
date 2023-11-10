@@ -9,6 +9,7 @@ mixin CandleEntity {
   late ui.Image? image;
   Color? borderColor;
   String? nick;
+  String? userId;
 
 
   List<double>? maValueList;
