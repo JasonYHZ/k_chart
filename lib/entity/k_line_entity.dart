@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import '../entity/k_entity.dart';
 
 class KLineEntity extends KEntity {
@@ -10,6 +12,7 @@ class KLineEntity extends KEntity {
   double? change;
   double? ratio;
   int? time;
+  late ui.Image? image;
 
   KLineEntity.fromCustom({
     this.amount,
@@ -21,6 +24,7 @@ class KLineEntity extends KEntity {
     required this.high,
     required this.low,
     required this.vol,
+    this.image,
   });
 
   KLineEntity.fromJson(Map<String, dynamic> json) {

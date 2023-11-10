@@ -7,6 +7,7 @@ import 'package:k_chart/utils/date_format_util.dart';
 import '../chart_style.dart' show ChartStyle;
 import '../entity/k_line_entity.dart';
 import '../k_chart_widget.dart';
+import 'avatar_image_painter.dart';
 
 export 'package:flutter/material.dart'
     show Color, required, TextStyle, Rect, Canvas, Size, CustomPainter;
@@ -107,7 +108,6 @@ abstract class BaseChartPainter extends CustomPainter {
     initRect(size);
     calculateValue();
     initChartRenderer();
-
     canvas.save();
     canvas.scale(1, 1);
     drawBg(canvas, size);

@@ -1,10 +1,14 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 
 import '../entity/candle_entity.dart';
 import '../k_chart_widget.dart' show MainState;
+import 'avatar_image_painter.dart';
 import 'base_chart_renderer.dart';
 
 enum VerticalTextAlignment { left, right }
+
 //For TrendLine
 double? trendLineMax;
 double? trendLineScale;
@@ -26,8 +30,7 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
   late Paint mLinePaint;
   final VerticalTextAlignment verticalTextAlignment;
 
-  MainRenderer(
-      Rect mainRect,
+  MainRenderer(Rect mainRect,
       double maxValue,
       double minValue,
       double topPadding,
@@ -40,12 +43,12 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
       this.verticalTextAlignment,
       [this.maDayList = const [5, 10, 20]])
       : super(
-            chartRect: mainRect,
-            maxValue: maxValue,
-            minValue: minValue,
-            topPadding: topPadding,
-            fixedLength: fixedLength,
-            gridColor: chartColors.gridColor) {
+      chartRect: mainRect,
+      maxValue: maxValue,
+      minValue: minValue,
+      topPadding: topPadding,
+      fixedLength: fixedLength,
+      gridColor: chartColors.gridColor) {
     mCandleWidth = this.chartStyle.candleWidth;
     mCandleLineWidth = this.chartStyle.candleLineWidth;
     mLinePaint = Paint()
@@ -114,7 +117,10 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
   void drawChart(CandleEntity lastPoint, CandleEntity curPoint, double lastX,
       double curX, Size size, Canvas canvas) {
     if (isLine) {
-      drawPolyline(lastPoint.close, curPoint.close, canvas, lastX, curX);
+      drawPolyline(lastPoint.close, curPoint.close, canvas, lastX, curX,
+          image: lastPoint.image,
+          nick: lastPoint.nick,
+          borderColor: lastPoint.borderColor);
     } else {
       drawCandle(curPoint, canvas, curX);
       if (state == MainState.MA) {
@@ -133,17 +139,12 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
 
   //画折线图
   drawPolyline(double lastPrice, double curPrice, Canvas canvas, double lastX,
-      double curX) {
-//    drawLine(lastPrice + 100, curPrice + 100, canvas, lastX, curX, ChartColors.kLineColor);
+      double curX,
+      {ui.Image? image, Color? borderColor, String? nick}) {
+    canvas.save();
+
     mLinePath ??= Path();
 
-//    if (lastX == curX) {
-//      mLinePath.moveTo(lastX, getY(lastPrice));
-//    } else {
-////      mLinePath.lineTo(curX, getY(curPrice));
-//      mLinePath.cubicTo(
-//          (lastX + curX) / 2, getY(lastPrice), (lastX + curX) / 2, getY(curPrice), curX, getY(curPrice));
-//    }
     if (lastX == curX) lastX = 0; //起点位置填充
     mLinePath!.moveTo(lastX, getY(lastPrice));
     mLinePath!.cubicTo((lastX + curX) / 2, getY(lastPrice), (lastX + curX) / 2,
@@ -170,7 +171,6 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
 
     canvas.drawPath(mLineFillPath!, mLineFillPaint);
     mLineFillPath!.reset();
-
     canvas.drawPath(
         mLinePath!,
         mLinePaint
@@ -178,6 +178,21 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
               this.chartStyle.mLineMinStrokeWidth,
               this.chartStyle.mLineMaxStrokeWidth));
     mLinePath!.reset();
+    canvas.restore();
+
+    if (image != null) {
+      final avatarSize = 20.0;
+      final avatarBorder = 4.0;
+      canvas.save();
+      final avatar = AvatarImagePainter(
+          image: image,
+          text: nick ?? "",
+          borderColor: borderColor ?? Colors.white);
+      canvas.translate(curX - ((avatarSize + avatarBorder) / 2),
+          getY(curPrice) - (avatarSize + avatarBorder));
+      avatar.paint(canvas, Size.square(avatarSize));
+      canvas.restore();
+    }
   }
 
   void drawMaLine(CandleEntity lastPoint, CandleEntity curPoint, Canvas canvas,
@@ -246,7 +261,7 @@ class MainRenderer extends BaseChartRenderer<CandleEntity> {
       double value = (gridRows - i) * rowSpace / scaleY + minValue;
       TextSpan span = TextSpan(text: "${format(value)}", style: textStyle);
       TextPainter tp =
-          TextPainter(text: span, textDirection: TextDirection.ltr);
+      TextPainter(text: span, textDirection: TextDirection.ltr);
       tp.layout();
 
       double offsetX;

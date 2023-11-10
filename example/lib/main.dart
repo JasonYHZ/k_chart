@@ -1,10 +1,13 @@
 import 'dart:convert';
+import 'dart:developer';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:k_chart/chart_translations.dart';
 import 'package:k_chart/flutter_k_chart.dart';
+import 'package:k_chart/renderer/avatar_image_painter.dart';
 
 void main() => runApp(MyApp());
 
@@ -38,13 +41,13 @@ class _MyHomePageState extends State<MyHomePage> {
   SecondaryState _secondaryState = SecondaryState.MACD;
   bool isLine = true;
   bool isChinese = true;
-  bool _hideGrid = false;
+  bool _hideGrid = true;
   bool _showNowPrice = true;
   List<DepthEntity>? _bids, _asks;
   bool isChangeUI = false;
   bool _isTrendLine = false;
-  bool _priceLeft = true;
-  VerticalTextAlignment _verticalTextAlignment = VerticalTextAlignment.left;
+  bool _priceLeft = false;
+  VerticalTextAlignment _verticalTextAlignment = VerticalTextAlignment.right;
 
   ChartStyle chartStyle = ChartStyle();
   ChartColors chartColors = ChartColors();
@@ -226,8 +229,8 @@ class _MyHomePageState extends State<MyHomePage> {
     /*
      * 可以翻墙使用方法1加载数据，不可以翻墙使用方法2加载数据，默认使用方法1加载最新数据
      */
-    final Future<String> future = getChatDataFromInternet(period);
-    //final Future<String> future = getChatDataFromJson();
+    // final Future<String> future = getChatDataFromInternet(period);
+    final Future<String> future = getChatDataFromJson();
     future.then((String result) {
       solveChatData(result);
     }).catchError((_) {
@@ -256,7 +259,9 @@ class _MyHomePageState extends State<MyHomePage> {
     return rootBundle.loadString('assets/chatData.json');
   }
 
-  void solveChatData(String result) {
+  void solveChatData(String result) async {
+    var image = await loadNetImage("https://imgapi.cn/qq.php?qq=2410768152");
+
     final Map parseJson = json.decode(result) as Map<dynamic, dynamic>;
     final list = parseJson['data'] as List<dynamic>;
     datas = list
@@ -265,6 +270,22 @@ class _MyHomePageState extends State<MyHomePage> {
         .reversed
         .toList()
         .cast<KLineEntity>();
+
+    for (var element in datas!) {
+      element.image = image;
+      element.nick = "PatterJasonK";
+      var rng = Random();
+      int randomNumber = rng.nextInt(100);  // 生成一个0到99的随机数
+      if (randomNumber % 2 == 0) {
+        element.borderColor = Colors.green;
+      } else {
+        element.borderColor = Colors.red;
+      }
+
+
+
+    }
+
     DataUtil.calculate(datas!);
     showLoading = false;
     setState(() {});
