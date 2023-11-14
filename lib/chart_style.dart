@@ -67,7 +67,7 @@ class ChartColors {
 }
 
 class ChartStyle {
-  double topPadding = 100.0;
+  double topPadding = 30.0;
 
   double bottomPadding = 20.0;
 
@@ -104,9 +104,9 @@ class ChartStyle {
   double nowPriceLineWidth = 1;
 
   // Line线基准宽度
-  double mLineStrokeWidth = 4;
+  double mLineStrokeWidth = 1;
   double mLineMinStrokeWidth = 0.1;
-  double mLineMaxStrokeWidth = 4;
+  double mLineMaxStrokeWidth = 1;
 
 
   int gridRows = 4;
