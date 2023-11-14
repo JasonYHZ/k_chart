@@ -55,6 +55,7 @@ class KChartWidget extends StatefulWidget {
   final VerticalTextAlignment verticalTextAlignment;
   final bool isTrendLine;
   final double xFrontPadding;
+  final bool canScale;
 
   KChartWidget(
     this.datas,
@@ -83,6 +84,7 @@ class KChartWidget extends StatefulWidget {
     this.flingCurve = Curves.decelerate,
     this.isOnDrag,
     this.verticalTextAlignment = VerticalTextAlignment.left,
+    this.canScale = true,
   });
 
   @override
@@ -223,6 +225,10 @@ class _KChartWidgetState extends State<KChartWidget>
             isScale = true;
           },
           onScaleUpdate: (details) {
+            if (!widget.canScale) {
+              return;
+            }
+
             if (isDrag || isLongPress) return;
             mScaleX = (_lastScale * details.scale).clamp(0.5, 2.2);
             notifyChanged();
